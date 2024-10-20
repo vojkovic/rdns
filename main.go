@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"time"
 	"unicode/utf8"
 )
 
@@ -17,6 +18,7 @@ type WeatherResponse struct {
 		Humidity   int     `json:"humidity"`
 	} `json:"main"`
 	Visibility int     `json:"visibility"`
+	Timezone   int     `json:"timezone"`
 	Weather []struct {
 		Description string `json:"description"`
 	} `json:"weather"`
@@ -36,7 +38,7 @@ type VisitorInfo struct {
 }
 
 const (
-	boxWidth = 40
+	boxWidth = 60
 )
 
 func fetchWeather(lat, lon float64) (WeatherResponse, error) {
@@ -105,6 +107,9 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	//timezone is a number of seconds after UTC i.e. Perth is 28800 (GMT+8)
+	localTime := time.Now().UTC().Add(time.Duration(weather.Timezone) * time.Second).Format("3:04 PM MST")
+
 	content := []string{
 		"IP Address: " + visitorInfo.IP,
 		"ASN: " + strings.TrimSpace(visitorInfo.ASN),
@@ -115,9 +120,9 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		fmt.Sprintf("Pressure: %d hPa", weather.Main.Pressure),
 		fmt.Sprintf("Humidity: %d%%", weather.Main.Humidity),
 		fmt.Sprintf("Visibility: %d m", weather.Visibility),
+		fmt.Sprintf("Time: %s", localTime),
 		fmt.Sprintf("Wind Speed: %.2f m/s", weather.Wind.Speed),
 		"Description: " + weather.Weather[0].Description,
-		"",
 	}
 
 	response := drawBox(content)
