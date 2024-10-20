@@ -108,7 +108,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//timezone is a number of seconds after UTC i.e. Perth is 28800 (GMT+8)
-	localTime := time.Now().UTC().Add(time.Duration(weather.Timezone) * time.Second).Format("3:04 PM MST")
+	localTime := time.Now().UTC().Add(time.Duration(weather.Timezone) * time.Second).Format("3:04 PM")
 
 	content := []string{
 		"IP Address: " + visitorInfo.IP,
