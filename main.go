@@ -15,8 +15,8 @@ type WeatherResponse struct {
 		Temp       float64 `json:"temp"`
 		Pressure   int     `json:"pressure"`
 		Humidity   int     `json:"humidity"`
-		Visibility int     `json:"visibility"`
 	} `json:"main"`
+	Visibility int     `json:"visibility"`
 	Weather []struct {
 		Description string `json:"description"`
 	} `json:"weather"`
@@ -114,7 +114,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		fmt.Sprintf("Temperature: %.2f °C", weather.Main.Temp),
 		fmt.Sprintf("Pressure: %d hPa", weather.Main.Pressure),
 		fmt.Sprintf("Humidity: %d%%", weather.Main.Humidity),
-		fmt.Sprintf("Visibility: %d m", weather.Main.Visibility),
+		fmt.Sprintf("Visibility: %d m", weather.Visibility),
 		fmt.Sprintf("Wind Speed: %.2f m/s", weather.Wind.Speed),
 		"Description: " + weather.Weather[0].Description,
 		"",
