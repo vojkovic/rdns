@@ -13,13 +13,13 @@ import (
 
 type WeatherResponse struct {
 	Main struct {
-		Temp       float64 `json:"temp"`
-		Pressure   int     `json:"pressure"`
-		Humidity   int     `json:"humidity"`
+		Temp     float64 `json:"temp"`
+		Pressure int     `json:"pressure"`
+		Humidity int     `json:"humidity"`
 	} `json:"main"`
 	Visibility int     `json:"visibility"`
 	Timezone   int     `json:"timezone"`
-	Weather []struct {
+	Weather    []struct {
 		Description string `json:"description"`
 	} `json:"weather"`
 	Wind struct {
@@ -36,10 +36,6 @@ type VisitorInfo struct {
 	Lat     float64 `json:"latitude"`
 	Lon     float64 `json:"longitude"`
 }
-
-const (
-	boxWidth = 60
-)
 
 func fetchWeather(lat, lon float64) (WeatherResponse, error) {
 	apiKey := os.Getenv("OPENWEATHERMAP_API_KEY")
@@ -78,13 +74,22 @@ func getVisitorInfo(r *http.Request) (*VisitorInfo, error) {
 }
 
 func drawBox(content []string) string {
+	maxLength := 0
+	for _, lineContent := range content {
+		lineLength := utf8.RuneCountInString(lineContent)
+		if lineLength > maxLength {
+			maxLength = lineLength
+		}
+	}
+	boxWidth := maxLength + 4 // 2 for padding left/right and 2 for box borders = 4
+
 	header := fmt.Sprintf("╭%s╮\n", strings.Repeat("─", boxWidth-2))
 	boxContent := header
 
 	for _, lineContent := range content {
 		contentLine := lineContent
-		if utf8.RuneCountInString(contentLine) > boxWidth-2 {
-			contentLine = contentLine[:boxWidth-5] + "..."
+		if utf8.RuneCountInString(contentLine) > boxWidth-4 {
+			contentLine = contentLine[:boxWidth-7] + "..."
 		}
 		padding := strings.Repeat(" ", boxWidth-utf8.RuneCountInString(contentLine)-3)
 		boxContent += fmt.Sprintf("│ %s%s│\n", contentLine, padding)
