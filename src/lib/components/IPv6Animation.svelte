@@ -12,34 +12,46 @@
 
     const steps = [
         {
-            title: "Original IPv6 Address",
-            content: "2a14:07c0:4b00::",
-            description: "This is our starting IPv6 address",
-            highlight: [0, 1, 2, 3, 5, 6, 7, 8, 10, 11, 12, 13]
+            title: "Original IPv6 Prefix",
+            content: "2a14:07c0:4b00::/40",
+            description: "This is the delegated IPv6 prefix with a /40 mask",
+            highlight: [0, 1, 2, 3, 5, 6, 7, 8, 10, 11]
         },
         {
             title: "Split into Nibbles",
             content: "2 a 1 4 0 7 c 0 4 b 0 0",
-            description: "Each hexadecimal digit is separated",
-            highlight: [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22]
+            description: "Each hexadecimal nibble is separated for processing",
+            highlight: [0, 2, 4, 6, 8, 10, 12, 14, 16, 18]
+        },
+        {
+            title: "Trim to Prefix Length",
+            content: "2 a 1 4 0 7 c 0 4 b",
+            description: "Nibbles outside the prefix length are removed",
+            highlight: [0, 2, 4, 6, 8, 10, 12, 14, 16, 18]
         },
         {
             title: "Reverse Order",
-            content: "0 0 b 4 0 c 7 0 4 1 a 2",
-            description: "The digits are reversed for DNS lookup",
-            highlight: [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22]
+            content: "b 4 0 c 7 0 4 1 a 2",
+            description: "The nibbles are reversed for DNS lookup order",
+            highlight: [0, 2, 4, 6, 8, 10, 12, 14, 16, 18]
         },
         {
             title: "Add Dots",
-            content: "0.0.b.4.0.c.7.0.4.1.a.2",
-            description: "Dots are added between each digit",
-            highlight: [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22]
+            content: "b.4.0.c.7.0.4.1.a.2",
+            description: "Dots are added between each nibble for DNS format",
+            highlight: [0, 2, 4, 6, 8, 10, 12, 14, 16, 18]
         },
         {
             title: "Add .ip6.arpa",
-            content: "0.0.b.4.0.c.7.0.4.1.a.2.ip6.arpa",
+            content: "b.4.0.c.7.0.4.1.a.2.ip6.arpa",
             description: "The .ip6.arpa suffix is added to complete the reverse DNS domain",
-            highlight: [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22]
+            highlight: [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 21, 22, 24, 25, 26, 27]
+        },
+        {
+            title: "Done",
+            content: "b.4.0.c.7.0.4.1.a.2.ip6.arpa",
+            description: "Your reverse DNS domain is ready!",
+            highlight: [0]
         }
     ];
 
@@ -56,8 +68,8 @@
         const maxFontSize = 1.2;
         const minFontSize = 0.5;
 
-        if (currentStep === steps.length - 1) {
-            fontSize = Math.min(0.7, maxFontSize);
+        if (currentStep === steps.length - 2) {
+            fontSize = Math.min(0.8, maxFontSize);
             return;
         }
 
@@ -144,30 +156,39 @@
 </script>
 
 <div class="animation-container" bind:this={container}>
-    <div class="progress-bar">
-        <div class="progress" style="width: {((currentStep + 1) / steps.length) * 100}%"></div>
-    </div>
+    <h2 class="step-title">{steps[currentStep].title}</h2>
 
     <div class="step-container">
         <div class="step-content">
             <div class="animation-stage">
-                <div class="ipv6-display" style="font-size: {fontSize}rem" key={currentStep}>
-                    {#each steps[currentStep].content.split('') as char, i}
-                        <span 
-                            class="character" 
-                            class:digit={char !== ':' && char !== '.' && char !== ' '}
-                            class:separator={char === ':' || char === '.'}
-                            class:space={char === ' '}
-                            class:highlight={steps[currentStep].highlight.includes(i)}
-                            style="--delay: {i * 50}ms"
-                        >
-                            {char}
-                        </span>
-                    {/each}
-                </div>
+                {#if currentStep === steps.length - 1}
+                    <div class="final-domain">
+                        {steps[currentStep].content}
+                    </div>
+                {:else}
+                    <div class="ipv6-display" style="font-size: {fontSize}rem" key={currentStep}>
+                        {#each steps[currentStep].content.split('') as char, i}
+                            <span 
+                                class="character" 
+                                class:digit={char !== ':' && char !== '.' && char !== ' ' && char !== '/'}
+                                class:separator={char === ':' || char === '.'}
+                                class:space={char === ' '}
+                                class:highlight={steps[currentStep].highlight.includes(i)}
+                                style="--delay: {i * 50}ms"
+                            >
+                                {char}
+                            </span>
+                        {/each}
+                    </div>
+                {/if}
             </div>
-            <p class="description">{steps[currentStep].description}</p>
         </div>
+    </div>
+
+    <p class="description">{steps[currentStep].description}</p>
+
+    <div class="progress-bar">
+        <div class="progress" style="width: {((currentStep + 1) / steps.length) * 100}%"></div>
     </div>
 </div>
 
@@ -180,6 +201,16 @@
         border: 1px solid var(--table-border);
         box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
         transform: rotate(0.5deg);
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    .step-title {
+        color: var(--text-color);
+        margin: 0;
+        font-size: 1.8rem;
+        text-align: center;
     }
 
     .progress-bar {
@@ -187,8 +218,8 @@
         height: 6px;
         background: rgba(255, 255, 255, 0.1);
         border-radius: 3px;
-        margin: 1rem 0;
         overflow: hidden;
+        margin-top: auto;
     }
 
     .progress {
@@ -198,7 +229,6 @@
     }
 
     .step-container {
-        margin-top: 1.5rem;
         min-height: 120px;
     }
 
@@ -246,7 +276,7 @@
     }
 
     .character.separator {
-        color: var(--primary);
+        color: var(--text-color);
         font-weight: 500;
     }
 
@@ -259,12 +289,36 @@
         color: var(--button-text-color);
         border-color: var(--primary);
     }
+    
+    .character.highlight.full-domain {
+        padding: 0.5rem 1rem;
+        border-radius: 0.5rem;
+        width: auto;
+        height: auto;
+    }
 
     .description {
         color: var(--subtext-color);
         text-align: center;
-        margin-top: 1rem;
+        margin: 0;
         font-size: 1.1rem;
+    }
+
+    .final-domain {
+        background: var(--primary);
+        color: var(--button-text-color);
+        padding: 0.8rem 1.5rem;
+        border-radius: 0.5rem;
+        font-family: 'Fira Code', monospace;
+        font-size: 1.4rem;
+        white-space: nowrap;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        animation: fadeIn 0.5s ease-out;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
     }
 
     @media (max-width: 768px) {
