@@ -1,20 +1,17 @@
-FROM golang:1.21 as builder
+FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-COPY go.mod main.go ./
+COPY package*.json ./
+COPY yarn.lock ./
 
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-s -w" -o main .
+RUN yarn install --frozen-lockfile
 
-FROM alpine:3.18 AS certs
+COPY . .
 
-RUN apk --no-cache add ca-certificates
+RUN yarn build
 
-FROM scratch
-
-COPY --from=builder /app/main /
-COPY --from=certs /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
-
-EXPOSE 8080
-
-CMD ["/main"]
+FROM cgr.dev/chainguard/nginx:latest AS production
+COPY --from=builder /app/build /usr/share/nginx/html
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+EXPOSE 80

@@ -1,0 +1,42 @@
+:root {
+    --background: hsl(0 0% 6%);
+    --primary: hsl(255, 78%, 55%);
+    --secondary: hsl(255, 78%, 50%);
+    --accent: hsl(0 0% 10%);
+    --text-color: #ffffff;
+    --subtext-color: #eee;
+    --hover-color: #aaa;
+    --button-text-color: #ffffff;
+    --table-border: #888;
+    --table-header-bg: #171717;
+}
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    background-color: var(--background);
+    color: var(--text-color);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    background-image: 
+        radial-gradient(circle at 25% 25%, rgba(255, 255, 255, 0.05) 0%, transparent 50%),
+        radial-gradient(circle at 75% 75%, rgba(255, 255, 255, 0.05) 0%, transparent 50%);
+    background-attachment: fixed;
+}
+
+@font-face {
+    font-family: 'Inter';
+    src: url('/fonts/Inter.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'Fira Code';
+    src: url('/fonts/FiraCode.woff2') format('woff2');
+}
+
