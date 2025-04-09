@@ -17,7 +17,7 @@
 <main>
     <div class="container">
         <h1 class="main-title">Did you know you can host a website on a reverse DNS domain?</h1>
-        <p class="subtitle">Read on to find out how!</p>
+        <p class="subtitle">Read on to find out how...</p>
 
         <div class="fun-fact">
             <div class="domain-example">b.4.0.c.7.0.4.1.a.2.ip6.arpa</div>
@@ -36,7 +36,7 @@
             </div>
 
             <p>That's right - you could technically host your personal blog on a reverse DNS domain if you wanted to!</p>
-            <p>Although, getting a TLS certificate for a reverse DNS domain is a bit tricky. Let's Encrypt won't issue a certificate. <span class="emoji">🤷‍♂️</span></p>
+            <p>Although, getting a TLS certificate for a reverse DNS domain is a bit tricky. CAs typically don't issue certificates for .arpa domains. <span class="emoji">🤷‍♂️</span></p>
         </div>
 
         <IPv6Animation />
@@ -68,7 +68,7 @@
         display: flex;
         flex-direction: column;
         align-items: center;
-        justify-content: center;
+        justify-content: flex-start;
         text-align: center;
         background-image: 
             radial-gradient(circle at 25% 25%, rgba(255, 255, 255, 0.05) 0%, transparent 50%),
@@ -76,9 +76,21 @@
         background-attachment: fixed;
     }
 
+    main {
+        width: 100%;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 1rem 0;
+    }
+
     .container {
         max-width: 800px;
         padding: 2rem;
+        width: 100%;
+        box-sizing: border-box;
+        margin: 0 auto;
     }
 
     .main-title {
@@ -117,6 +129,8 @@
         padding: 1rem;
         border-radius: 0.5rem;
         border: 1px solid var(--table-border);
+        overflow-x: auto;
+        white-space: nowrap;
     }
 
     .explanation {
@@ -149,6 +163,8 @@
         margin: 1rem 0;
         border: 1px solid var(--table-border);
         transform: rotate(-0.5deg);
+        overflow-x: auto;
+        white-space: nowrap;
     }
 
     .aaaa-record {
@@ -175,17 +191,81 @@
         margin: 0 0.2rem;
     }
 
+    /* Mobile styles */
     @media (max-width: 768px) {
+        main {
+            padding: 0.5rem 0;
+        }
+
         .container {
             padding: 1rem;
         }
         
         .main-title {
-            font-size: 2.5rem;
+            font-size: 2rem;
+            padding: 0 1rem;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+            padding: 0 1rem;
         }
 
         .fun-fact, .explanation {
             transform: none;
+            padding: 1rem;
+            margin: 1rem;
+        }
+
+        .domain-example {
+            font-size: 0.9rem;
+            padding: 0.75rem;
+            margin: 0.5rem 0;
+        }
+
+        .explanation h2 {
+            font-size: 1.3rem;
+        }
+
+        .explanation p {
+            font-size: 0.9rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .code-block {
+            transform: none;
+            font-size: 0.8rem;
+            padding: 0.75rem;
+            margin: 0.75rem 0;
+        }
+
+        .emoji {
+            font-size: 1rem;
+        }
+    }
+
+    /* Small mobile devices */
+    @media (max-width: 480px) {
+        .container {
+            padding: 0.5rem;
+        }
+
+        .main-title {
+            font-size: 1.75rem;
+        }
+
+        .subtitle {
+            font-size: 1rem;
+        }
+
+        .fun-fact, .explanation {
+            padding: 0.75rem;
+            margin: 0.75rem;
+        }
+
+        .domain-example {
+            font-size: 0.8rem;
         }
     }
 </style>

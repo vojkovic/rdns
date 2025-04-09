@@ -61,6 +61,27 @@
         const display = container.querySelector('.ipv6-display');
         if (!display) return;
 
+        const isSecondToLastStep = currentStep === steps.length - 2;
+        
+        if (isSecondToLastStep) {
+            if (window.innerWidth <= 480) {
+                fontSize = 0.6;
+            } else if (window.innerWidth <= 768) {
+                fontSize = 0.7;
+            } else {
+                fontSize = 0.8;
+            }
+            return;
+        }
+        
+        if (window.innerWidth <= 480) {
+            fontSize = 1.1;
+            return;
+        } else if (window.innerWidth <= 768) {
+            fontSize = 1.2;
+            return;
+        }
+
         const content = steps[currentStep].content;
         const charCount = content.length;
         const availableWidth = containerWidth - 40;
@@ -68,17 +89,10 @@
         const maxFontSize = 1.2;
         const minFontSize = 0.5;
 
-        if (currentStep === steps.length - 2) {
-            fontSize = Math.min(0.8, maxFontSize);
-            return;
-        }
-
-        const optimalFontSize = Math.min(
+        fontSize = Math.min(
             maxFontSize,
             Math.max(minFontSize, availableWidth / (charCount * minCharWidth))
         );
-
-        fontSize = optimalFontSize;
     }
 
     function handleResize() {
@@ -195,15 +209,20 @@
 <style>
     .animation-container {
         background: var(--accent);
-        padding: 2rem;
+        padding: 1.5rem;
         border-radius: 1.5rem;
-        margin: 2rem 0;
+        margin: 1.5rem 0;
         border: 1px solid var(--table-border);
         box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
         transform: rotate(0.5deg);
         display: flex;
         flex-direction: column;
-        gap: 1.5rem;
+        gap: 1rem;
+        width: 100%;
+        box-sizing: border-box;
+        max-width: 100%;
+        overflow: hidden;
+        min-height: 250px;
     }
 
     .step-title {
@@ -229,7 +248,21 @@
     }
 
     .step-container {
-        min-height: 120px;
+        min-height: 80px;
+        width: 100%;
+        overflow: hidden;
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .step-content {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 
     .animation-stage {
@@ -237,9 +270,10 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        padding: 1.5rem 0;
+        padding: 0.75rem 0;
         overflow-x: auto;
         overflow-y: hidden;
+        -webkit-overflow-scrolling: touch;
     }
 
     .ipv6-display {
@@ -248,11 +282,8 @@
         justify-content: center;
         align-items: center;
         gap: 0.15rem;
-        font-family: 'Fira Code', monospace;
-        line-height: 1;
-        white-space: nowrap;
-        padding: 0 1rem;
-        transition: font-size 0.3s ease;
+        min-width: min-content;
+        max-width: 100%;
     }
 
     .character {
@@ -299,9 +330,9 @@
 
     .description {
         color: var(--subtext-color);
-        text-align: center;
         margin: 0;
         font-size: 1.1rem;
+        text-align: center;
     }
 
     .final-domain {
@@ -323,12 +354,88 @@
 
     @media (max-width: 768px) {
         .animation-container {
-            padding: 1rem;
+            padding: 0.5rem;
+            margin: 0.5rem 0;
             transform: none;
+            gap: 0.25rem;
+            width: 100%;
+            min-height: 180px;
         }
 
-        .ipv6-display {
+        .step-title {
+            font-size: 1rem;
+        }
+
+        .step-container {
+            min-height: 40px;
+        }
+
+        .animation-stage {
+            padding: 0.25rem 0;
+        }
+
+        .description {
             font-size: 0.8rem;
+        }
+        
+        .character {
+            width: 0.85em;
+            height: 0.85em;
+        }
+        
+        .character.digit {
+            padding: 0.08rem 0.15rem;
+            border-radius: 0.2rem;
+        }
+        
+        .final-domain {
+            padding: 0.4rem 0.6rem;
+            font-size: 0.85rem;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .animation-container {
+            padding: 0.25rem;
+            margin: 0.25rem 0;
+            gap: 0.15rem;
+            width: 100%;
+            min-height: 150px;
+        }
+
+        .step-title {
+            font-size: 0.85rem;
+        }
+
+        .step-container {
+            min-height: 25px;
+        }
+
+        .animation-stage {
+            padding: 0.15rem 0;
+        }
+
+        .description {
+            font-size: 0.7rem;
+        }
+        
+        .character {
+            width: 0.75em;
+            height: 0.75em;
+        }
+        
+        .character.digit {
+            padding: 0.03rem 0.08rem;
+            border-radius: 0.15rem;
+        }
+        
+        .final-domain {
+            padding: 0.25rem 0.4rem;
+            font-size: 0.75rem;
+        }
+        
+        .progress-bar {
+            height: 3px;
         }
     }
 </style> 
