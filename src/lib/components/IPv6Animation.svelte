@@ -64,21 +64,25 @@
         const isSecondToLastStep = currentStep === steps.length - 2;
         
         if (isSecondToLastStep) {
-            if (window.innerWidth <= 480) {
-                fontSize = 0.6;
+            if (window.innerWidth <= 360) {
+                fontsize = 0.3;
+            } else if (window.innerWidth <= 480) {
+                fontSize = 0.5;
             } else if (window.innerWidth <= 768) {
-                fontSize = 0.7;
+                fontSize = 0.6;
             } else {
-                fontSize = 0.8;
+                fontSize = 0.75;
             }
             return;
         }
         
-        if (window.innerWidth <= 480) {
-            fontSize = 1.1;
+        if (window.innerWidth <= 360) {
+            fontsize = 0.6;
+        } else if (window.innerWidth <= 480) {
+            fontSize = 1;
             return;
         } else if (window.innerWidth <= 768) {
-            fontSize = 1.2;
+            fontSize = 0.9;
             return;
         }
 
@@ -208,12 +212,12 @@
 
 <style>
     .animation-container {
-        background: var(--accent);
-        padding: 1.5rem;
-        border-radius: 1.5rem;
-        margin: 1.5rem 0;
+        background: var(--background);
+        padding: 2rem;
+        border-radius: 1rem;
+        margin: 2rem 0;
         border: 1px solid var(--table-border);
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
         transform: rotate(0.5deg);
         display: flex;
         flex-direction: column;
@@ -222,7 +226,7 @@
         box-sizing: border-box;
         max-width: 100%;
         overflow: hidden;
-        min-height: 250px;
+        min-height: auto;
     }
 
     .step-title {
@@ -232,29 +236,28 @@
         text-align: center;
     }
 
+    .step-container {
+        min-height: 80px;
+        width: 100%;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
     .progress-bar {
         width: 100%;
         height: 6px;
         background: rgba(255, 255, 255, 0.1);
         border-radius: 3px;
         overflow: hidden;
-        margin-top: auto;
+        margin-top: 0.5rem;
     }
 
     .progress {
         height: 100%;
         background: var(--primary);
         transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    .step-container {
-        min-height: 80px;
-        width: 100%;
-        overflow: hidden;
-        flex: 1;
-        display: flex;
-        align-items: center;
-        justify-content: center;
     }
 
     .step-content {
@@ -354,12 +357,11 @@
 
     @media (max-width: 768px) {
         .animation-container {
-            padding: 0.5rem;
-            margin: 0.5rem 0;
             transform: none;
-            gap: 0.25rem;
-            width: 100%;
-            min-height: 180px;
+            padding: 1rem;
+            margin: 1rem;
+            width: calc(100% - 2rem);
+            gap: 0.5rem;
         }
 
         .step-title {
@@ -367,7 +369,11 @@
         }
 
         .step-container {
-            min-height: 40px;
+            min-height: 50px;
+        }
+
+        .progress-bar {
+            margin-top: 0.25rem;
         }
 
         .animation-stage {
@@ -396,11 +402,10 @@
 
     @media (max-width: 480px) {
         .animation-container {
-            padding: 0.25rem;
-            margin: 0.25rem 0;
-            gap: 0.15rem;
-            width: 100%;
-            min-height: 150px;
+            padding: 0.75rem;
+            margin: 0.75rem;
+            width: calc(100% - 1.5rem);
+            gap: 0.25rem;
         }
 
         .step-title {
@@ -408,7 +413,11 @@
         }
 
         .step-container {
-            min-height: 25px;
+            min-height: 35px;
+        }
+
+        .progress-bar {
+            margin-top: 0.15rem;
         }
 
         .animation-stage {
@@ -432,10 +441,6 @@
         .final-domain {
             padding: 0.25rem 0.4rem;
             font-size: 0.75rem;
-        }
-        
-        .progress-bar {
-            height: 3px;
         }
     }
 </style> 

@@ -26,7 +26,7 @@
 
         <div class="explanation">
             <h2>Wait, what? <span class="emoji">🤔</span></h2>
-            <p>While reverse DNS domains are typically used for PTR records (you know, the boring stuff), there's nothing stopping you from adding A records to them as well. <a href="#" on:click|preventDefault={toggleAAAA} class="aaaa-link">(or AAAA)</a></p>
+            <p>Reverse DNS domains are usually just for PTR records, but here's a fun fact: you can actually add A records to them too! <a href="#" on:click|preventDefault={toggleAAAA} class="aaaa-link">(or even AAAA records)</a></p>
             
             <div class="code-block">
                 b.4.0.c.7.0.4.1.a.2.ip6.arpa. IN A 67.219.98.26
