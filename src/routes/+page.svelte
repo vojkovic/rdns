@@ -29,9 +29,9 @@
             <p>Reverse DNS domains are usually just for PTR records, but here's a fun fact: you can actually add A records to them too! <a href="#" on:click|preventDefault={toggleAAAA} class="aaaa-link">(or even AAAA records)</a></p>
             
             <div class="code-block">
-                b.4.0.c.7.0.4.1.a.2.ip6.arpa. IN A 67.219.98.26
+                b.4.0.c.7.0.4.1.a.2.ip6.arpa. IN A 23.140.20.94
                 <div class="aaaa-record" bind:this={codeBlock}>
-                    b.4.0.c.7.0.4.1.a.2.ip6.arpa. IN AAAA 2a14:7c0:4b10::1
+                    b.4.0.c.7.0.4.1.a.2.ip6.arpa. IN AAAA 2a14:7c0:4b00::94
                 </div>
             </div>
 
