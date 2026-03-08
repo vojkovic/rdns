@@ -11,7 +11,7 @@ COPY . .
 
 RUN yarn build
 
-FROM cgr.dev/chainguard/nginx:latest AS production
+FROM nginx:alpine AS production
 COPY --from=builder /app/build /usr/share/nginx/html
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 EXPOSE 80
