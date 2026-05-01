@@ -1,271 +1,382 @@
 <script lang="ts">
     import '../app.css';
-    import IPv6Animation from '$lib/components/IPv6Animation.svelte';
+    import { fade } from 'svelte/transition';
+    import { onMount } from 'svelte';
 
+    const DEFAULT_DOMAIN = 'b.4.0.c.7.0.4.1.a.2.ip6.arpa';
+    let domain = DEFAULT_DOMAIN;
+
+    onMount(() => {
+        const h = window.location.hostname;
+        if (h.endsWith('.ip6.arpa') || h.endsWith('.in-addr.arpa')) {
+            domain = h;
+        }
+    });
+
+    let currentSlide = 0;
     let showAAAA = false;
-    let codeBlock: HTMLElement;
+    const totalSlides = 4;
 
-    function toggleAAAA() {
-        showAAAA = !showAAAA;
-        if (codeBlock) {
-            codeBlock.style.height = showAAAA ? 'auto' : '0';
-            codeBlock.style.opacity = showAAAA ? '1' : '0';
+    function next() {
+        if (currentSlide < totalSlides - 1) currentSlide++;
+    }
+
+    function prev() {
+        if (currentSlide > 0) currentSlide--;
+    }
+
+    function handleKey(e: KeyboardEvent) {
+        if (e.key === 'ArrowRight' || e.key === ' ') {
+            e.preventDefault();
+            next();
+        } else if (e.key === 'ArrowLeft') {
+            e.preventDefault();
+            prev();
         }
     }
 </script>
 
+<svelte:window on:keydown={handleKey} />
+
 <main>
-    <div class="container">
-        <h1 class="main-title">Did you know you can host a website on a reverse DNS domain?</h1>
-        <p class="subtitle">Read on to find out how...</p>
+    {#key currentSlide}
+        <div class="slide" in:fade={{ duration: 200, delay: 100 }} out:fade={{ duration: 100 }}>
 
-        <div class="fun-fact">
-            <div class="domain-example">b.4.0.c.7.0.4.1.a.2.ip6.arpa</div>
-            <p>This is actually a valid domain name! <span class="emoji">🎉</span></p>
-        </div>
-
-        <div class="explanation">
-            <h2>Wait, what? <span class="emoji">🤔</span></h2>
-            <p>Reverse DNS domains are usually just for PTR records, but here's a fun fact: you can actually add A records to them too! <a href="#" on:click|preventDefault={toggleAAAA} class="aaaa-link">(or even AAAA records)</a></p>
-            
-            <div class="code-block">
-                b.4.0.c.7.0.4.1.a.2.ip6.arpa. IN A 23.140.20.94
-                <div class="aaaa-record" bind:this={codeBlock}>
-                    b.4.0.c.7.0.4.1.a.2.ip6.arpa. IN AAAA 2a14:7c0:4b00::94
+            {#if currentSlide === 0}
+                <div class="slide-content center">
+                    <h1 class="main-title">Did you know you can host a website on a reverse DNS domain?</h1>
+                    <p class="subtitle">Click anywhere to find out how...</p>
                 </div>
-            </div>
 
-            <p>That's right - you could technically host your personal blog on a reverse DNS domain if you wanted to!</p>
-            <p>Although, getting a TLS certificate for a reverse DNS domain is a bit tricky. CAs typically don't issue certificates for .arpa domains. <span class="emoji">🤷‍♂️</span></p>
+            {:else if currentSlide === 1}
+                <div class="slide-content center">
+                    <div class="card">
+                        <div class="domain-example">https://{domain}</div>
+                        <p>This is actually a valid domain name! <span class="emoji">🎉</span></p>
+                    </div>
+                </div>
+
+            {:else if currentSlide === 2}
+                <div class="slide-content center">
+                    <div class="card text-left">
+                        <h2>Wait, what? <span class="emoji">🤔</span></h2>
+                        <p>Reverse DNS domains are usually just for PTR records, but you can actually add A records to them too (or even <button class="inline-toggle" on:click|stopPropagation={() => showAAAA = !showAAAA}>AAAA records</button>)!</p>
+                        <div class="code-block">
+                            <div>{domain}. IN A 23.140.20.94</div>
+                            {#if showAAAA}
+                                <div transition:fade={{ duration: 150 }}>{domain}. IN AAAA 2a14:7c0:4b00::94</div>
+                            {/if}
+                        </div>
+                        <p>You could technically host your mail server on a reverse DNS domain!</p>
+                        <p class="muted">Although, getting a <a href="https://vojk.au/posts/how_to_get_a_ip6_arpa_tls_certificate_part_2/" target="_blank" rel="noopener noreferrer" on:click|stopPropagation>TLS certificate</a> is tricky.</p>
+                    </div>
+                </div>
+
+            {:else if currentSlide === 3}
+                <div class="slide-content center">
+                    <p class="credit-name"><a href="https://vojk.au" target="_blank" rel="noopener noreferrer" on:click|stopPropagation>Brock Vojkovic</a></p>
+                    <p class="credit-line"><a href="https://as44354.net" target="_blank" rel="noopener noreferrer" on:click|stopPropagation>AS44354</a></p>
+                </div>
+            {/if}
+
         </div>
+    {/key}
 
-        <IPv6Animation />
+    <div class="nav">
+        <button class="nav-btn" on:click|stopPropagation={prev} disabled={currentSlide === 0}>←</button>
+        <div class="dots">
+            {#each Array(totalSlides) as _, i}
+                <button
+                    class="dot"
+                    class:active={i === currentSlide}
+                    on:click|stopPropagation={() => currentSlide = i}
+                    aria-label="Go to slide {i + 1}"
+                ></button>
+            {/each}
+        </div>
+        <button class="nav-btn" on:click|stopPropagation={next} disabled={currentSlide === totalSlides - 1}>→</button>
     </div>
+
+    <!-- Click anywhere to advance -->
+    <button class="click-area" on:click={next} aria-label="Next slide"></button>
 </main>
 
 <style>
-    :root {
-        --background: hsl(0 0% 6%);
-        --primary: hsl(255, 78%, 55%);
-        --secondary: hsl(255, 78%, 50%);
-        --accent: hsl(0 0% 10%);
-        --text-color: #ffffff;
-        --subtext-color: #eee;
-        --hover-color: #aaa;
-        --button-text-color: #ffffff;
-        --table-border: #888;
-        --table-header-bg: #171717;
-    }
-
-    body {
-        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-        line-height: 1.6;
-        margin: 0;
-        padding: 0;
-        background-color: var(--background);
-        color: var(--text-color);
-        min-height: 100vh;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: flex-start;
-        text-align: center;
-        background-image: 
-            radial-gradient(circle at 25% 25%, rgba(255, 255, 255, 0.05) 0%, transparent 50%),
-            radial-gradient(circle at 75% 75%, rgba(255, 255, 255, 0.05) 0%, transparent 50%);
-        background-attachment: fixed;
-    }
-
     main {
+        width: 100vw;
+        height: 100vh;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+    }
+
+    .click-area {
+        position: absolute;
+        inset: 0;
+        z-index: 0;
+        background: none;
+        border: none;
+        cursor: pointer;
+        outline: none;
+    }
+
+    .slide {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1;
+        pointer-events: none;
+        padding: 2rem;
+        box-sizing: border-box;
+    }
+
+    .slide-content {
+        max-width: 640px;
         width: 100%;
-        min-height: 100vh;
+        pointer-events: auto;
+    }
+
+    .slide-content.center {
         display: flex;
         flex-direction: column;
         align-items: center;
-        padding: 1rem 0;
-    }
-
-    .container {
-        max-width: 800px;
-        padding: 2rem;
-        width: 100%;
-        box-sizing: border-box;
-        margin: 0 auto;
+        text-align: center;
     }
 
     .main-title {
-        font-size: 3.5rem;
-        margin-bottom: 1rem;
-        background: linear-gradient(135deg, var(--primary), var(--secondary));
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        line-height: 1.2;
+        font-size: 2.6rem;
+        margin: 0 0 1.5rem 0;
+        color: var(--text);
+        line-height: 1.25;
+        font-weight: 700;
     }
 
     .subtitle {
-        font-size: 1.5rem;
-        color: var(--subtext-color);
-        margin-bottom: 3rem;
-        font-style: italic;
+        font-size: 1.1rem;
+        color: var(--text-muted);
+        margin: 0;
     }
 
-    .fun-fact {
-        background: var(--accent);
+    .card {
+        background: var(--surface);
         padding: 2rem;
-        border-radius: 1rem;
-        margin-bottom: 2rem;
-        border: 1px solid var(--table-border);
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
-        transform: rotate(-1deg);
+        border-radius: 0.75rem;
+        border: 1px solid var(--border);
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .card.text-left {
+        text-align: left;
+    }
+
+    .card h2 {
+        color: var(--text);
+        margin: 0 0 1rem 0;
+        font-size: 1.5rem;
+        font-weight: 600;
+    }
+
+    .card p {
+        color: var(--text-muted);
+        margin: 0 0 0.75rem 0;
+        font-size: 1rem;
+        line-height: 1.6;
+    }
+
+    .card p.muted {
+        opacity: 0.7;
+        font-size: 0.9rem;
     }
 
     .domain-example {
         font-family: 'Fira Code', monospace;
-        font-size: 1.2rem;
-        color: var(--primary);
-        margin: 1rem 0;
-        word-break: break-all;
-        background: var(--background);
-        padding: 1rem;
+        font-size: 1.15rem;
+        color: var(--accent);
+        background: rgba(255, 255, 255, 0.04);
+        padding: 0.75rem 1.25rem;
         border-radius: 0.5rem;
-        border: 1px solid var(--table-border);
-        overflow-x: auto;
-        white-space: nowrap;
-    }
-
-    .explanation {
-        background: var(--background);
-        padding: 2rem;
-        border-radius: 1rem;
-        margin: 2rem 0;
-        border: 1px solid var(--table-border);
-        text-align: left;
-        transform: rotate(1deg);
-    }
-
-    .explanation h2 {
-        color: var(--primary);
-        margin-top: 0;
-        font-size: 1.8rem;
-    }
-
-    .explanation p {
-        color: var(--subtext-color);
+        border: 1px solid var(--border);
         margin-bottom: 1rem;
-        font-size: 1.1rem;
+        letter-spacing: 0.02em;
     }
 
     .code-block {
-        background: var(--table-header-bg);
+        background: rgba(0, 0, 0, 0.5);
         padding: 1rem;
         border-radius: 0.5rem;
         font-family: 'Fira Code', monospace;
-        margin: 1rem 0;
-        border: 1px solid var(--table-border);
-        transform: rotate(-0.5deg);
-        overflow-x: auto;
-        white-space: nowrap;
+        font-size: 0.85rem;
+        margin: 0.75rem 0;
+        border: 1px solid var(--border);
+        line-height: 1.8;
+        color: var(--text);
     }
 
-    .aaaa-record {
-        height: 0;
-        opacity: 0;
-        overflow: hidden;
-        transition: all 0.3s ease-in-out;
-    }
-
-    .aaaa-link {
-        color: var(--primary);
-        text-decoration: none;
-        border-bottom: 1px dashed var(--primary);
+    .inline-toggle {
+        background: none;
+        border: none;
+        color: var(--accent);
         cursor: pointer;
+        font: inherit;
+        padding: 0;
+        text-decoration: underline;
+        text-decoration-style: dotted;
+        text-underline-offset: 2px;
     }
 
-    .aaaa-link:hover {
-        color: var(--secondary);
-        border-bottom-color: var(--secondary);
+    .inline-toggle:hover {
+        text-decoration-style: solid;
     }
 
     .emoji {
-        font-size: 1.5rem;
-        margin: 0 0.2rem;
+        font-size: 1.2rem;
     }
 
-    /* Mobile styles */
+    a {
+        color: var(--accent);
+        text-decoration: underline;
+        text-decoration-style: dotted;
+        text-underline-offset: 2px;
+    }
+
+    a:hover {
+        text-decoration-style: solid;
+    }
+
+    .attribution {
+        margin-top: 0.5rem;
+        font-size: 0.85rem;
+        color: var(--text-muted);
+    }
+
+    .credit-line {
+        font-size: 0.9rem;
+        color: var(--text-muted);
+        margin: 0 0 0.5rem 0;
+    }
+
+    .credit-name {
+        font-size: 1.4rem;
+        font-weight: 600;
+        color: var(--text);
+        margin: 0 0 0.25rem 0;
+    }
+
+    .credit-sub {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        margin: 0;
+    }
+
+    .nav {
+        position: fixed;
+        bottom: 1.5rem;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        z-index: 10;
+        pointer-events: auto;
+    }
+
+    .nav-btn {
+        background: none;
+        border: 1px solid var(--border);
+        color: var(--text-muted);
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        cursor: pointer;
+        font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: color 0.2s, border-color 0.2s;
+    }
+
+    .nav-btn:hover:not(:disabled) {
+        color: var(--text);
+        border-color: var(--text-muted);
+    }
+
+    .nav-btn:disabled {
+        opacity: 0.2;
+        cursor: default;
+    }
+
+    .dots {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: var(--border);
+        border: none;
+        padding: 0;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+
+    .dot.active {
+        background: var(--accent);
+    }
+
     @media (max-width: 768px) {
-        main {
-            padding: 0.5rem 0;
+        .slide {
+            padding: 1.5rem;
         }
-
-        .container {
-            padding: 1rem;
-        }
-        
         .main-title {
-            font-size: 2rem;
-            padding: 0 1rem;
+            font-size: 1.8rem;
         }
-
         .subtitle {
-            font-size: 1.1rem;
-            margin-bottom: 1.5rem;
-            padding: 0 1rem;
+            font-size: 1rem;
         }
-
-        .fun-fact, .explanation {
-            transform: none;
-            padding: 1rem;
-            margin: 1rem;
+        .card {
+            padding: 1.25rem;
         }
-
-        .domain-example {
-            font-size: 0.9rem;
-            padding: 0.75rem;
-            margin: 0.5rem 0;
-        }
-
-        .explanation h2 {
+        .card h2 {
             font-size: 1.3rem;
         }
-
-        .explanation p {
+        .card p {
             font-size: 0.9rem;
-            margin-bottom: 0.75rem;
         }
-
+        .domain-example {
+            font-size: 0.9rem;
+            padding: 0.6rem 0.8rem;
+        }
         .code-block {
-            transform: none;
-            font-size: 0.8rem;
-            padding: 0.75rem;
-            margin: 0.75rem 0;
+            font-size: 0.7rem;
         }
-
-        .emoji {
-            font-size: 1rem;
+        .nav {
+            bottom: 1rem;
         }
     }
 
-    /* Small mobile devices */
     @media (max-width: 480px) {
-        .container {
-            padding: 0.5rem;
+        .slide {
+            padding: 1rem;
         }
-
         .main-title {
-            font-size: 1.75rem;
+            font-size: 1.5rem;
         }
-
-        .subtitle {
-            font-size: 1rem;
+        .card {
+            padding: 1rem;
         }
-
-        .fun-fact, .explanation {
-            padding: 0.75rem;
-            margin: 0.75rem;
-        }
-
         .domain-example {
             font-size: 0.8rem;
+        }
+        .code-block {
+            font-size: 0.6rem;
+            overflow-x: auto;
         }
     }
 </style>
