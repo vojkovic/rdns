@@ -6,8 +6,11 @@
 
     const DEFAULT_DOMAIN = 'b.4.0.c.7.0.4.1.a.2.ip6.arpa';
     let domain = DEFAULT_DOMAIN;
+    let urlScheme = 'https:';
 
     onMount(() => {
+        const p = window.location.protocol;
+        urlScheme = p === 'http:' || p === 'https:' ? p : 'https:';
         const h = window.location.hostname;
         if (h.endsWith('.ip6.arpa') || h.endsWith('.in-addr.arpa')) {
             domain = h;
@@ -52,7 +55,7 @@
             {:else if currentSlide === 1}
                 <div class="slide-content center">
                     <div class="card">
-                        <div class="domain-example">https://{domain}</div>
+                        <div class="domain-example">{urlScheme}//{domain}</div>
                         <p>This is actually a valid domain name! <span class="emoji">🎉</span></p>
                     </div>
                 </div>
